@@ -1,0 +1,87 @@
+{
+  "users": {
+    "flow-check@example.com": {
+      "email": "flow-check@example.com",
+      "createdAt": "2026-05-11T13:02:17.746914+00:00",
+      "onboardingComplete": true,
+      "daily_logs": {
+        "2026-05-11": {
+          "energy": 2,
+          "exercise": 1,
+          "mood": "anxious",
+          "notes": "soft test",
+          "nutrition": 3,
+          "sleep": 5,
+          "symptoms": [
+            "fatigue"
+          ],
+          "date": "2026-05-11",
+          "updatedAt": "2026-05-11T13:02:17.751405+00:00"
+        }
+      },
+      "analytics": {
+        "labels": [
+          "2026-05-11"
+        ],
+        "series": {
+          "mood": [
+            2
+          ],
+          "sleep": [
+            5.0
+          ],
+          "energy": [
+            2.0
+          ],
+          "nutrition": [
+            3.0
+          ],
+          "exercise": [
+            1.0
+          ]
+        },
+        "trends": {
+          "mood": 0,
+          "sleep": 0,
+          "energy": 0,
+          "nutrition": 0,
+          "exercise": 0
+        },
+        "summary": "Bloom noticed your recent patterns and translated them into gentle, practical next steps.",
+        "recommendations": [
+          "Your recent low sleep and low energy may be your body asking for steadier rest. Consider a softer evening routine and gentler movement for a few days."
+        ],
+        "preferredName": "Ava"
+      },
+      "preferredName": "Ava",
+      "age": 28,
+      "diagnosisStatus": "Exploring symptoms",
+      "averageCycleLength": 32,
+      "lastPeriodDate": "2026-05-01",
+      "symptoms": [
+        "Fatigue"
+      ],
+      "wellnessGoals": [
+        "Sleep better"
+      ],
+      "updatedAt": "2026-05-11T13:02:17.749289+00:00"
+    }
+  },
+  "otp_sessions": {
+    "demo@example.com": {
+      "otpHash": "d0b522c47adc0aeaf6f9a0b38dc098de134f45e8f2dd2cb13bbe513854c7b824",
+      "expiresAt": "2026-05-11T13:09:13.289580+00:00",
+      "pendingSignup": true
+    },
+    "flow-check@example.com": {
+      "otpHash": "6206bfaf55157195fd0d224697380e9f0745dd1cb1d1a13816b69e10fd9e9f12",
+      "expiresAt": "2026-05-11T13:12:17.744112+00:00",
+      "pendingSignup": true
+    },
+    "cvsree@gmail.com": {
+      "otpHash": "b405df24bab4bc204c626c32cc5c0f8452327e72957b5288e5d6918ebb3cd7ba",
+      "expiresAt": "2026-05-11T14:08:55.862296+00:00",
+      "pendingSignup": true
+    }
+  }
+}

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bloom — PCOS Wellness Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="ambient"></div>
+  <main id="app">
+    <section id="authView" class="auth-shell view active">
+      <div class="brand-card">
+        <img src="{{ url_for('static', filename='assets/bloom-logo.svg') }}" class="logo" alt="Bloom lotus moon logo">
+        <h1>Welcome to Bloom</h1>
+        <p>A gentle space to understand your cycle, symptoms, mood, and wellbeing with compassion.</p>
+        <form id="authForm" class="stack">
+          <label>Email address<input id="emailInput" type="email" placeholder="you@example.com" required></label>
+          <div class="button-row">
+            <button class="primary-btn" data-intent="login" type="submit">Login</button>
+            <button class="ghost-btn" data-intent="signup" type="submit">Sign Up</button>
+          </div>
+        </form>
+        <form id="otpForm" class="stack hidden">
+          <label>6-digit OTP<input id="otpInput" inputmode="numeric" maxlength="6" placeholder="123456"></label>
+          <button class="primary-btn" type="submit">Verify gently</button>
+        </form>
+        <p id="authMessage" class="soft-message">All data is securely stored and handled privately.</p>
+      </div>
+    </section>
+
+    <section id="onboardingView" class="view page-wrap">
+      <div class="section-heading">
+        <span class="eyebrow">First bloom</span>
+        <h2>Let Bloom learn how to support you.</h2>
+      </div>
+      <form id="onboardingForm" class="panel grid-form">
+        <label>Preferred name<input name="preferredName" required></label>
+        <label>Age<input name="age" type="number" min="12" max="80"></label>
+        <label>PCOS diagnosis status<select name="diagnosisStatus"><option>Diagnosed</option><option>Suspected</option><option>Exploring symptoms</option><option>Prefer not to say</option></select></label>
+        <label>Average cycle length<input name="averageCycleLength" type="number" min="15" max="90" placeholder="e.g. 32"></label>
+        <label>Date of last period<input name="lastPeriodDate" type="date"></label>
+        <fieldset><legend>Symptoms experienced</legend><div id="symptomChoices" class="chips"></div></fieldset>
+        <fieldset><legend>Wellness goals</legend><div id="goalChoices" class="chips"></div></fieldset>
+        <div class="care-note">
+          Bloom intentionally does not ask for height or weight because BMI is an outdated metric that does not account for hormones, body composition, muscle mass, or individual health differences. This app focuses on wellbeing rather than weight.
+        </div>
+        <button class="primary-btn wide" type="submit">Enter Bloom</button>
+      </form>
+    </section>
+
+    <section id="checkinView" class="view page-wrap">
+      <div class="section-heading">
+        <span class="eyebrow">Daily check-in</span>
+        <h2>How are you arriving today?</h2>
+      </div>
+      <form id="checkinForm" class="panel grid-form"></form>
+    </section>
+
+    <section id="dashboardView" class="view dashboard">
+      <aside class="sidebar">
+        <img src="{{ url_for('static', filename='assets/bloom-logo.svg') }}" class="mini-logo" alt="Bloom">
+        <nav>
+          <button class="nav-btn active" data-tab="home">Dashboard</button>
+          <button class="nav-btn" data-tab="calendar">Calendar</button>
+          <button class="nav-btn" data-tab="analytics">Analytics</button>
+          <button class="nav-btn" data-tab="chat">Chatbot</button>
+          <button class="nav-btn" data-tab="myths">Myths vs Facts</button>
+          <button class="nav-btn" data-tab="profile">Profile</button>
+        </nav>
+      </aside>
+      <div class="content">
+        <header class="topbar"><div><span class="eyebrow">Bloom dashboard</span><h2 id="greeting">Your soft space</h2></div><button id="logoutBtn" class="ghost-btn">Logout</button></header>
+        <section id="homeTab" class="tab active">
+          <div class="hero-panel">
+            <div><h3>Today can be gentle and still count.</h3><p id="dailyEmpathy">Track what matters without turning your body into a project.</p></div>
+          </div>
+          <div id="insightCards" class="card-grid"></div>
+        </section>
+        <section id="calendarTab" class="tab">
+          <div class="split">
+            <div class="panel"><div id="calendarGrid" class="calendar-grid"></div></div>
+            <form id="logEditor" class="panel grid-form compact"></form>
+          </div>
+        </section>
+        <section id="analyticsTab" class="tab">
+          <div class="chart-grid">
+            <div class="panel"><canvas id="moodChart"></canvas></div>
+            <div class="panel"><canvas id="sleepChart"></canvas></div>
+            <div class="panel"><canvas id="energyChart"></canvas></div>
+            <div class="panel"><canvas id="habitChart"></canvas></div>
+          </div>
+        </section>
+        <section id="chatTab" class="tab">
+          <div class="chat-shell panel">
+            <div id="chatMessages" class="chat-messages"></div>
+            <form id="chatForm" class="chat-form"><input id="chatInput" placeholder="Ask about cortisol, sleep, nutrition, myths..."><button class="primary-btn">Send</button></form>
+          </div>
+        </section>
+        <section id="mythsTab" class="tab"><div id="mythCards" class="myth-grid"></div></section>
+        <section id="profileTab" class="tab"><div id="profileCard" class="panel"></div></section>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/state.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/onboarding.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/checkin.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
