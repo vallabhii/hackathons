@@ -3,6 +3,7 @@ import random
 import smtplib
 import os
 import resend
+from datetime import datetime, timezone
 from email.message import EmailMessage
 
 resend.api_key = os.getenv("RESEND_API_KEY")
