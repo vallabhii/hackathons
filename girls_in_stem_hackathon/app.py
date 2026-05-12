@@ -1,3 +1,4 @@
+import smtplib
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify, render_template, request, session
@@ -34,31 +35,40 @@ def index():
 
 @app.post("/api/auth/request-otp")
 def request_otp():
-    data = request.get_json(force=True)
-    email = (data.get("email") or "").strip().lower()
-    intent = data.get("intent", "login")
-    if not email or "@" not in email:
-        return jsonify({"error": "Please enter a valid email address."}), 400
+    try:
+        data = request.get_json(force=True)
+        email = (data.get("email") or "").strip().lower()
+        intent = data.get("intent", "login")
+        if not email or "@" not in email:
+            return jsonify({"error": "Please enter a valid email address."}), 400
 
-    user_exists = store.user_exists(email)
-    if intent == "login" and not user_exists:
-        return jsonify({
-            "needsSignup": True,
-            "message": "This email is not registered yet. Please create an account first 🌸"
-        }), 404
+        user_exists = store.user_exists(email)
+        if intent == "login" and not user_exists:
+            return jsonify({
+                "needsSignup": True,
+                "message": "This email is not registered yet. Please create an account first 🌸"
+            }), 404
 
-    otp, otp_hash, expires_at = create_otp(app.config["OTP_EXPIRY"])
-    store.save_otp(email, otp_hash, expires_at, pending_signup=not user_exists)
-    send_otp(email, otp, app.config)
-    response = {
-        "message": "A soft little code is on its way to your inbox.",
-        "pendingSignup": not user_exists
-    }
-    if not app.config["SMTP_HOST"]:
-        response["devOtp"] = otp
-        response["message"] = "Development mode: use the OTP shown below to continue."
-    return jsonify(response)
-
+        otp, otp_hash, expires_at = create_otp(app.config["OTP_EXPIRY"])
+        store.save_otp(email, otp_hash, expires_at, pending_signup=not user_exists)
+        send_otp(email, otp, app.config)
+        response = {
+            "message": "A soft little code is on its way to your inbox.",
+            "pendingSignup": not user_exists
+        }
+        if not app.config["SMTP_HOST"]:
+            response["devOtp"] = otp
+            response["message"] = "Development mode: use the OTP shown below to continue."
+        return jsonify(response)
+    except smtplib.SMTPAuthenticationError:
+        app.logger.exception("Bloom OTP email authentication failed")
+        return jsonify({"error": "Gmail rejected the SMTP login. Please create a fresh Google App Password and update SMTP_PASSWORD in Render."}), 502
+    except smtplib.SMTPException:
+        app.logger.exception("Bloom OTP email sending failed")
+        return jsonify({"error": "Bloom could not send the OTP email. Please check the SMTP settings in Render."}), 502
+    except Exception:
+        app.logger.exception("Bloom OTP request failed")
+        return jsonify({"error": "Bloom could not start signup. Please check Render logs for the exact backend error."}), 500
 
 @app.post("/api/auth/verify-otp")
 def verify_otp():
@@ -174,3 +184,4 @@ def chat():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
