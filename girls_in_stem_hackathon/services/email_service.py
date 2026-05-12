@@ -1,9 +1,11 @@
 import hashlib
 import random
 import smtplib
-from datetime import datetime, timezone
+import os
+import resend
 from email.message import EmailMessage
 
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 def create_otp(expiry_delta):
     otp = f"{random.randint(100000, 999999)}"
@@ -11,24 +13,24 @@ def create_otp(expiry_delta):
     expires_at = datetime.now(timezone.utc) + expiry_delta
     return otp, otp_hash, expires_at.isoformat()
 
-
 def send_otp(email, otp, config):
     subject = "Your Bloom verification code"
-    body = (
-        f"Your Bloom code is {otp}.\n\n"
-        "This code will expire soon. Take your time, breathe softly, and come back when ready."
-    )
-    if not config.get("SMTP_HOST") or not config.get("SMTP_USERNAME"):
-        print(f"[Bloom dev OTP] {email}: {otp}")
-        return
 
-    message = EmailMessage()
-    message["Subject"] = subject
-    message["From"] = config["SMTP_FROM_EMAIL"]
-    message["To"] = email
-    message.set_content(body)
+    html = f"""
+    <div style="font-family: Arial, sans-serif;">
+        <h2>Your Bloom code is:</h2>
+        <h1>{otp}</h1>
+        <p>
+            This code will expire soon.
+            Take your time, breathe softly,
+            and come back when ready.
+        </p>
+    </div>
+    """
 
-    with smtplib.SMTP(config["SMTP_HOST"], config["SMTP_PORT"]) as smtp:
-        smtp.starttls()
-        smtp.login(config["SMTP_USERNAME"], config["SMTP_PASSWORD"])
-        smtp.send_message(message)
+    resend.Emails.send({
+        "from": "onboarding@resend.dev",
+        "to": email,
+        "subject": subject,
+        "html": html
+    })
