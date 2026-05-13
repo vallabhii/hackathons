@@ -18,6 +18,14 @@ store = BloomStore(app.config["FIREBASE_CREDENTIALS_PATH"])
 
 ALLOWED_DASHBOARD_PAGES = {"home", "calendar", "analytics", "chat", "myths", "profile"}
 ALLOWED_CYCLE_PHASES = {"menstrual", "follicular", "ovulatory", "luteal", "unsure"}
+LOG_NUMBER_FIELDS = {
+    "sleep": (0, 14, "Sleep hours"),
+    "energy": (1, 5, "Energy level"),
+    "exerciseHours": (0, 12, "Exercise hours"),
+    "calories": (0, 6000, "Calories"),
+    "proteinGrams": (0, 300, "Protein grams"),
+    "fatGrams": (0, 250, "Fat grams")
+}
 
 
 def current_email():
@@ -84,6 +92,19 @@ def validate_log_payload(log, date_key):
     if cycle_phase not in ALLOWED_CYCLE_PHASES:
         return "Please choose a valid cycle phase."
     log["cyclePhase"] = cycle_phase
+
+    for field, (minimum, maximum, label) in LOG_NUMBER_FIELDS.items():
+        value = log.get(field)
+        if value in ("", None):
+            log[field] = ""
+            continue
+        try:
+            numeric_value = float(value)
+        except (TypeError, ValueError):
+            return f"{label} must be a number."
+        if numeric_value < minimum or numeric_value > maximum:
+            return f"{label} must be between {minimum} and {maximum}."
+        log[field] = numeric_value
     return None
 
 

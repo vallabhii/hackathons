@@ -5,6 +5,8 @@
 
 /* Dashboard layout fixes */
 #dashboardView.active{display:block}
+.dashboard .tab{display:none}
+.dashboard .tab.active{display:block}
 .dashboard{min-height:100vh}
 .content{width:calc(100% - 260px);max-width:1280px;margin-left:260px;padding:32px 36px 48px}
 .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}

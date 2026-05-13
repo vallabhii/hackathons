@@ -17,7 +17,15 @@ function renderCharts() {
   if (Bloom.charts.habitChart) Bloom.charts.habitChart.destroy();
   Bloom.charts.habitChart = new Chart(document.querySelector("#habitChart"), {
     type: "bar",
-    data: { labels, datasets: [{ label: "Nutrition", data: s.nutrition, backgroundColor: "#ffd6ebaa" }, { label: "Exercise", data: s.exercise, backgroundColor: "#8e6ab8cc" }] },
+    data: {
+      labels,
+      datasets: [
+        { label: "Exercise hours", data: s.exerciseHours, backgroundColor: "#8e6ab8cc" },
+        { label: "Calories", data: s.calories, backgroundColor: "#f7d6a3cc" },
+        { label: "Protein grams", data: s.proteinGrams, backgroundColor: "#a8d8ffcc" },
+        { label: "Fat grams", data: s.fatGrams, backgroundColor: "#ffd6ebaa" }
+      ]
+    },
     options: { responsive: true, plugins: { legend: { labels: { color: "#fff1f7" } } }, scales: { x: { ticks: { color: "#dac5e8" } }, y: { ticks: { color: "#dac5e8" } } } }
   });
 }

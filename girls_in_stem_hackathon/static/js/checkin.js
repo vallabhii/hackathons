@@ -8,13 +8,20 @@ const moodMessages = {
 };
 const cyclePhases = ["menstrual", "follicular", "ovulatory", "luteal", "unsure"];
 
+function logValue(log, key, fallbackKey = null) {
+  const value = log[key] ?? (fallbackKey ? log[fallbackKey] : "");
+  return value === undefined || value === null ? "" : value;
+}
+
 function checkinFields(dateKey = Bloom.today, log = {}) {
   return `
     <label>Mood<select name="mood">${["happy","sad","anxious","angry","tired","neutral"].map(v => `<option ${log.mood === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
     <label>Energy level<select name="energy">${[1,2,3,4,5].map(v => `<option value="${v}" ${String(log.energy) === String(v) ? "selected" : ""}>${v}</option>`).join("")}</select></label>
-    <label>Sleep hours<input name="sleep" type="number" min="0" max="14" step=".5" value="${log.sleep || ""}"></label>
-    <label>Nutrition<select name="nutrition">${[1,2,3,4,5].map(v => `<option value="${v}" ${String(log.nutrition) === String(v) ? "selected" : ""}>${v}</option>`).join("")}</select></label>
-    <label>Exercise<select name="exercise">${[0,1,2,3,4,5].map(v => `<option value="${v}" ${String(log.exercise) === String(v) ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+    <label>Sleep hours<input name="sleep" type="number" min="0" max="14" step=".5" value="${logValue(log, "sleep")}"></label>
+    <label>Exercise hours<input name="exerciseHours" type="number" min="0" max="12" step=".25" value="${logValue(log, "exerciseHours", "exercise")}"></label>
+    <label>Calories<input name="calories" type="number" min="0" max="6000" step="1" value="${logValue(log, "calories")}"></label>
+    <label>Protein grams<input name="proteinGrams" type="number" min="0" max="300" step="1" value="${logValue(log, "proteinGrams")}"></label>
+    <label>Fat grams<input name="fatGrams" type="number" min="0" max="250" step="1" value="${logValue(log, "fatGrams")}"></label>
     <label>Symptoms<input name="symptoms" placeholder="cramps, acne, fatigue..." value="${(log.symptoms || []).join(", ")}"></label>
     <label>Cycle phase<select name="cyclePhase" required>${cyclePhases.map(v => `<option value="${v}" ${log.cyclePhase === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
     <label>Date<input name="date" type="date" max="${Bloom.today}" value="${dateKey}"></label>
