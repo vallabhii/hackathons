@@ -1,7 +1,7 @@
 const Bloom = {
   email: "",
   user: null,
-  today: "",
+  today: window.BLOOM_TODAY || "",
   logs: [],
   analytics: null,
   charts: {},
@@ -18,4 +18,14 @@ function showToast(message) {
 function showView(id) {
   document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
   document.querySelector(`#${id}`).classList.add("active");
+}
+
+function showDashboardPage(page = "home") {
+  const targetPage = document.querySelector(`#${page}Tab`) ? page : "home";
+  document.querySelectorAll(".nav-btn").forEach(item => {
+    item.classList.toggle("active", item.dataset.tab === targetPage);
+  });
+  document.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
+  document.querySelector(`#${targetPage}Tab`).classList.add("active");
+  if (targetPage === "analytics") renderCharts();
 }

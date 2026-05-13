@@ -29,15 +29,21 @@ function renderProfile() {
   `;
 }
 
-document.querySelectorAll(".nav-btn").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".nav-btn").forEach(item => item.classList.remove("active"));
-    document.querySelectorAll(".tab").forEach(item => item.classList.remove("active"));
-    button.classList.add("active");
-    document.querySelector(`#${button.dataset.tab}Tab`).classList.add("active");
-    if (button.dataset.tab === "analytics") renderCharts();
+document.querySelectorAll(".nav-btn").forEach(link => {
+  link.addEventListener("click", event => {
+    event.preventDefault();
+    const page = link.dataset.tab;
+    history.pushState({ page }, "", link.getAttribute("href"));
+    showDashboardPage(page);
   });
 });
+
+window.addEventListener("popstate", () => showDashboardPage(currentDashboardPage()));
+
+function currentDashboardPage() {
+  const page = window.location.pathname.split("/").filter(Boolean).pop();
+  return page === "dashboard" || !page ? "home" : page;
+}
 
 async function refreshLogs() {
   Bloom.logs = (await api.get("/api/logs")).logs;
@@ -56,6 +62,7 @@ async function loadDashboard() {
   renderMyths();
   renderProfile();
   renderCharts();
+  showDashboardPage(window.BLOOM_INITIAL_PAGE || currentDashboardPage());
   if (!document.querySelector("#chatMessages").children.length) {
     addBubble("Hi, I’m Bloom. Ask me about PCOS, cortisol, insulin resistance, sleep, nutrition, fertility, or myths. I’ll keep it kind.");
   }

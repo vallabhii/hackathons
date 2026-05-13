@@ -43,7 +43,7 @@
         <label>Age<input name="age" type="number" min="12" max="80"></label>
         <label>PCOS diagnosis status<select name="diagnosisStatus"><option>Diagnosed</option><option>Suspected</option><option>Exploring symptoms</option><option>Prefer not to say</option></select></label>
         <label>Average cycle length<input name="averageCycleLength" type="number" min="15" max="90" placeholder="e.g. 32"></label>
-        <label>Date of last period<input name="lastPeriodDate" type="date"></label>
+        <label>Date of last period<input name="lastPeriodDate" type="date" max="{{ today }}"></label>
         <fieldset><legend>Symptoms experienced</legend><div id="symptomChoices" class="chips"></div></fieldset>
         <fieldset><legend>Wellness goals</legend><div id="goalChoices" class="chips"></div></fieldset>
         <div class="care-note">
@@ -65,29 +65,29 @@
       <aside class="sidebar">
         <img src="{{ url_for('static', filename='assets/bloom-logo.svg') }}" class="mini-logo" alt="Bloom">
         <nav>
-          <button class="nav-btn active" data-tab="home">Dashboard</button>
-          <button class="nav-btn" data-tab="calendar">Calendar</button>
-          <button class="nav-btn" data-tab="analytics">Analytics</button>
-          <button class="nav-btn" data-tab="chat">Chatbot</button>
-          <button class="nav-btn" data-tab="myths">Myths vs Facts</button>
-          <button class="nav-btn" data-tab="profile">Profile</button>
+          <a class="nav-btn{% if initial_page == 'home' %} active{% endif %}" href="/dashboard" data-tab="home">Dashboard</a>
+          <a class="nav-btn{% if initial_page == 'calendar' %} active{% endif %}" href="/dashboard/calendar" data-tab="calendar">Calendar</a>
+          <a class="nav-btn{% if initial_page == 'analytics' %} active{% endif %}" href="/dashboard/analytics" data-tab="analytics">Analytics</a>
+          <a class="nav-btn{% if initial_page == 'chat' %} active{% endif %}" href="/dashboard/chat" data-tab="chat">Chatbot</a>
+          <a class="nav-btn{% if initial_page == 'myths' %} active{% endif %}" href="/dashboard/myths" data-tab="myths">Myths vs Facts</a>
+          <a class="nav-btn{% if initial_page == 'profile' %} active{% endif %}" href="/dashboard/profile" data-tab="profile">Profile</a>
         </nav>
       </aside>
       <div class="content">
         <header class="topbar"><div><span class="eyebrow">Bloom dashboard</span><h2 id="greeting">Your soft space</h2></div><button id="logoutBtn" class="ghost-btn">Logout</button></header>
-        <section id="homeTab" class="tab active">
+        <section id="homeTab" class="tab{% if initial_page == 'home' %} active{% endif %}">
           <div class="hero-panel">
             <div><h3>Today can be gentle and still count.</h3><p id="dailyEmpathy">Track what matters without turning your body into a project.</p></div>
           </div>
           <div id="insightCards" class="card-grid"></div>
         </section>
-        <section id="calendarTab" class="tab">
+        <section id="calendarTab" class="tab{% if initial_page == 'calendar' %} active{% endif %}">
           <div class="split">
             <div class="panel"><div id="calendarGrid" class="calendar-grid"></div></div>
             <form id="logEditor" class="panel grid-form compact"></form>
           </div>
         </section>
-        <section id="analyticsTab" class="tab">
+        <section id="analyticsTab" class="tab{% if initial_page == 'analytics' %} active{% endif %}">
           <div class="chart-grid">
             <div class="panel"><canvas id="moodChart"></canvas></div>
             <div class="panel"><canvas id="sleepChart"></canvas></div>
@@ -95,18 +95,22 @@
             <div class="panel"><canvas id="habitChart"></canvas></div>
           </div>
         </section>
-        <section id="chatTab" class="tab">
+        <section id="chatTab" class="tab{% if initial_page == 'chat' %} active{% endif %}">
           <div class="chat-shell panel">
             <div id="chatMessages" class="chat-messages"></div>
             <form id="chatForm" class="chat-form"><input id="chatInput" placeholder="Ask about cortisol, sleep, nutrition, myths..."><button class="primary-btn">Send</button></form>
           </div>
         </section>
-        <section id="mythsTab" class="tab"><div id="mythCards" class="myth-grid"></div></section>
-        <section id="profileTab" class="tab"><div id="profileCard" class="panel"></div></section>
+        <section id="mythsTab" class="tab{% if initial_page == 'myths' %} active{% endif %}"><div id="mythCards" class="myth-grid"></div></section>
+        <section id="profileTab" class="tab{% if initial_page == 'profile' %} active{% endif %}"><div id="profileCard" class="panel"></div></section>
       </div>
     </section>
   </main>
   <div id="toast" class="toast"></div>
+  <script>
+    window.BLOOM_INITIAL_PAGE = "{{ initial_page }}";
+    window.BLOOM_TODAY = "{{ today }}";
+  </script>
   <script src="{{ url_for('static', filename='js/api.js') }}"></script>
   <script src="{{ url_for('static', filename='js/state.js') }}"></script>
   <script src="{{ url_for('static', filename='js/auth.js') }}"></script>

@@ -16,6 +16,9 @@ app.config.from_object(Config)
 CORS(app, supports_credentials=True)
 store = BloomStore(app.config["FIREBASE_CREDENTIALS_PATH"])
 
+ALLOWED_DASHBOARD_PAGES = {"home", "calendar", "analytics", "chat", "myths", "profile"}
+ALLOWED_CYCLE_PHASES = {"menstrual", "follicular", "ovulatory", "luteal", "unsure"}
+
 
 def current_email():
     return session.get("email")
@@ -30,7 +33,58 @@ def require_auth():
 
 @app.get("/")
 def index():
-    return render_template("index.html")
+    return render_app()
+
+
+@app.get("/dashboard")
+def dashboard_home():
+    return render_app("home")
+
+
+@app.get("/dashboard/<page>")
+def dashboard_page(page):
+    return render_app(page if page in ALLOWED_DASHBOARD_PAGES else "home")
+
+
+def today_iso():
+    return datetime.now(timezone.utc).date().isoformat()
+
+
+def render_app(page="home"):
+    return render_template("index.html", initial_page=page, today=today_iso())
+
+
+def parse_iso_date(value, field_name):
+    if not value:
+        return None, None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date(), None
+    except ValueError:
+        return None, f"{field_name} must be a valid date."
+
+
+def validate_onboarding_profile(profile):
+    last_period_date = (profile.get("lastPeriodDate") or "").strip()
+    parsed_date, error = parse_iso_date(last_period_date, "Date of last period")
+    if error:
+        return error
+    if parsed_date and parsed_date > datetime.now(timezone.utc).date():
+        return "Date of last period cannot be after today."
+    return None
+
+
+def validate_log_payload(log, date_key):
+    parsed_date, error = parse_iso_date(date_key, "Log date")
+    if error:
+        return error
+    if parsed_date and parsed_date > datetime.now(timezone.utc).date():
+        return "Check-in date cannot be after today."
+
+    cycle_phase = (log.get("cyclePhase") or "").strip().lower()
+    if cycle_phase not in ALLOWED_CYCLE_PHASES:
+        return "Please choose a valid cycle phase."
+    log["cyclePhase"] = cycle_phase
+    return None
 
 
 @app.post("/api/auth/request-otp")
@@ -83,7 +137,7 @@ def verify_otp():
     if not user:
         store.create_user(email)
         user = store.get_user(email)
-    today = datetime.now(timezone.utc).date().isoformat()
+    today = today_iso()
     return jsonify({
         "user": user,
         "needsOnboarding": not user.get("onboardingComplete"),
@@ -104,7 +158,7 @@ def me():
     if error:
         return error
     user = store.get_user(email)
-    today = datetime.now(timezone.utc).date().isoformat()
+    today = today_iso()
     return jsonify({
         "user": user,
         "needsOnboarding": not user.get("onboardingComplete"),
@@ -119,6 +173,9 @@ def onboarding():
     if error:
         return error
     profile = request.get_json(force=True)
+    validation_error = validate_onboarding_profile(profile)
+    if validation_error:
+        return jsonify({"error": validation_error}), 400
     store.update_user(email, {
         "preferredName": profile.get("preferredName", "").strip(),
         "age": profile.get("age"),
@@ -155,6 +212,9 @@ def save_log(date_key):
     if error:
         return error
     log = request.get_json(force=True)
+    validation_error = validate_log_payload(log, date_key)
+    if validation_error:
+        return jsonify({"error": validation_error}), 400
     log["date"] = date_key
     log["updatedAt"] = datetime.now(timezone.utc).isoformat()
     store.save_log(email, date_key, log)

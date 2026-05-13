@@ -14,10 +14,18 @@ document.querySelector("#onboardingForm").addEventListener("submit", async event
   event.preventDefault();
   const form = new FormData(event.currentTarget);
   const payload = Object.fromEntries(form.entries());
+  if (payload.lastPeriodDate && payload.lastPeriodDate > Bloom.today) {
+    showToast("Date of last period cannot be after today.");
+    return;
+  }
   payload.symptoms = form.getAll("symptoms");
   payload.wellnessGoals = form.getAll("wellnessGoals");
-  const data = await api.post("/api/onboarding", payload);
-  Bloom.user = data.user;
-  showToast("Your Bloom space is ready.");
-  await loadDashboard();
+  try {
+    const data = await api.post("/api/onboarding", payload);
+    Bloom.user = data.user;
+    showToast("Your Bloom space is ready.");
+    await loadDashboard();
+  } catch (error) {
+    showToast(error.message);
+  }
 });

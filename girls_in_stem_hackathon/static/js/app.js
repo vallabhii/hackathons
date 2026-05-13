@@ -10,6 +10,9 @@ async function routeAfterAuth(data) {
     showView("checkinView");
     return;
   }
+  if (!window.location.pathname.startsWith("/dashboard")) {
+    history.replaceState({ page: "home" }, "", "/dashboard");
+  }
   await loadDashboard();
 }
 
