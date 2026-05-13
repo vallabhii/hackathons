@@ -15,7 +15,7 @@
   <main id="app">
     <section id="authView" class="auth-shell view active">
       <div class="brand-card">
-        <img src="{{ url_for('static', filename='assets/bloom-logo.svg') }}" class="logo" alt="Bloom lotus moon logo">
+        <img src="{{ url_for('static', filename='assets/bloom-logo.png') }}?v=2" class="logo" alt="Bloom lotus moon logo">
         <h1>Welcome to Bloom</h1>
         <p>A gentle space to understand your cycle, symptoms, mood, and wellbeing with compassion.</p>
         <form id="authForm" class="stack">
@@ -63,7 +63,7 @@
 
     <section id="dashboardView" class="view dashboard">
       <aside class="sidebar">
-        <img src="{{ url_for('static', filename='assets/bloom-logo.svg') }}" class="mini-logo" alt="Bloom">
+        <img src="{{ url_for('static', filename='assets/bloom-logo.png') }}?v=2" class="mini-logo" alt="Bloom">
         <nav>
           <a class="nav-btn{% if initial_page == 'home' %} active{% endif %}" href="/dashboard" data-tab="home">Dashboard</a>
           <a class="nav-btn{% if initial_page == 'calendar' %} active{% endif %}" href="/dashboard/calendar" data-tab="calendar">Calendar</a>
