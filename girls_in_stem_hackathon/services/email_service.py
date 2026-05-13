@@ -30,7 +30,7 @@ def send_otp(email, otp, config):
     """
 
     resend.Emails.send({
-        "from": "onboarding@resend.dev",
+        "from": "Bloom <noreply@bloompcoswellnesstracker.in>",
         "to": email,
         "subject": subject,
         "html": html
