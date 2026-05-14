@@ -10,9 +10,14 @@ from firebase_admin import credentials, firestore
 
 
 class BloomStore:
-    def __init__(self, credentials_path=""):
+    def __init__(self, credentials_path="", credentials_json=""):
         self.db = None
-        if credentials_path and os.path.exists(credentials_path):
+        if credentials_json:
+            if not firebase_admin._apps:
+                cred = credentials.Certificate(json.loads(credentials_json))
+                firebase_admin.initialize_app(cred)
+            self.db = firestore.client()
+        elif credentials_path and os.path.exists(credentials_path):
             if not firebase_admin._apps:
                 cred = credentials.Certificate(credentials_path)
                 firebase_admin.initialize_app(cred)

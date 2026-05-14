@@ -19,14 +19,16 @@ pip install -r requirements.txt
 - Create a Firebase project.
 - Enable Firestore.
 - Download a service account JSON file.
-- Set `FIREBASE_CREDENTIALS_PATH` in `.env` to that file path.
+- For local development, set `FIREBASE_CREDENTIALS_PATH` in `.env` to that file path.
+- For Render, set `FIREBASE_CREDENTIALS_JSON` to the full service account JSON content.
 
 If Firebase is not configured, Bloom runs with a local development JSON database at `instance/local_store.json`.
 
 4. Email OTP:
 
-- Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, and `SMTP_FROM_EMAIL`.
-- If SMTP is not configured, OTPs are printed in the Flask console for development.
+- Set `RESEND_API_KEY`.
+- Optionally set `RESEND_FROM_EMAIL`; it defaults to `Bloom <noreply@bloompcoswellnesstracker.in>`.
+- If Resend is not configured, OTPs are shown on screen for local development.
 
 5. Run:
 

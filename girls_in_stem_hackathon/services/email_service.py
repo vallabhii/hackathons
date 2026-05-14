@@ -1,12 +1,7 @@
 import hashlib
 import random
-import smtplib
-import os
 import resend
 from datetime import datetime, timezone
-from email.message import EmailMessage
-
-resend.api_key = os.getenv("RESEND_API_KEY")
 
 def create_otp(expiry_delta):
     otp = f"{random.randint(100000, 999999)}"
@@ -15,6 +10,7 @@ def create_otp(expiry_delta):
     return otp, otp_hash, expires_at.isoformat()
 
 def send_otp(email, otp, config):
+    resend.api_key = config["RESEND_API_KEY"]
     subject = "Your Bloom verification code"
 
     html = f"""
@@ -30,7 +26,7 @@ def send_otp(email, otp, config):
     """
 
     resend.Emails.send({
-        "from": "Bloom <noreply@bloompcoswellnesstracker.in>",
+        "from": config["RESEND_FROM_EMAIL"],
         "to": email,
         "subject": subject,
         "html": html

@@ -1,4 +1,3 @@
-import smtplib
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify, render_template, request, session
@@ -14,7 +13,10 @@ from services.firebase_service import BloomStore
 app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app, supports_credentials=True)
-store = BloomStore(app.config["FIREBASE_CREDENTIALS_PATH"])
+store = BloomStore(
+    app.config["FIREBASE_CREDENTIALS_PATH"],
+    app.config["FIREBASE_CREDENTIALS_JSON"]
+)
 
 ALLOWED_DASHBOARD_PAGES = {"home", "calendar", "analytics", "chat", "myths", "profile"}
 ALLOWED_CYCLE_PHASES = {"menstrual", "follicular", "ovulatory", "luteal", "unsure"}
@@ -126,24 +128,19 @@ def request_otp():
 
         otp, otp_hash, expires_at = create_otp(app.config["OTP_EXPIRY"])
         store.save_otp(email, otp_hash, expires_at, pending_signup=not user_exists)
-        send_otp(email, otp, app.config)
         response = {
             "message": "A soft little code is on its way to your inbox.",
             "pendingSignup": not user_exists
         }
-        if not app.config["SMTP_HOST"]:
+        if app.config["RESEND_API_KEY"]:
+            send_otp(email, otp, app.config)
+        else:
             response["devOtp"] = otp
             response["message"] = "Development mode: use the OTP shown below to continue."
         return jsonify(response)
-    except smtplib.SMTPAuthenticationError:
-        app.logger.exception("Bloom OTP email authentication failed")
-        return jsonify({"error": "Gmail rejected the SMTP login. Please create a fresh Google App Password and update SMTP_PASSWORD in Render."}), 502
-    except smtplib.SMTPException:
-        app.logger.exception("Bloom OTP email sending failed")
-        return jsonify({"error": "Bloom could not send the OTP email. Please check the SMTP settings in Render."}), 502
     except Exception:
         app.logger.exception("Bloom OTP request failed")
-        return jsonify({"error": "Bloom could not start signup. Please check Render logs for the exact backend error."}), 500
+        return jsonify({"error": "Bloom could not send the OTP email or save the auth session. Please check Render environment variables and logs."}), 500
 
 @app.post("/api/auth/verify-otp")
 def verify_otp():
@@ -185,6 +182,15 @@ def me():
         "needsOnboarding": not user.get("onboardingComplete"),
         "needsCheckin": not store.get_log(email, today),
         "today": today
+    })
+
+
+@app.get("/api/config-status")
+def config_status():
+    return jsonify({
+        "firebaseConfigured": store.db is not None,
+        "emailConfigured": bool(app.config["RESEND_API_KEY"]),
+        "storage": "firebase" if store.db else "local-dev-json"
     })
 
 
